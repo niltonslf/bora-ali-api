@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
-export default class Event extends BaseModel {
+export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
@@ -12,17 +12,11 @@ export default class Event extends BaseModel {
   public updatedAt: DateTime
 
   @column()
-  public image: string
-
-  @column()
   public name: string
 
   @column()
-  public description: string
+  public email: string
 
   @column()
-  public userId: string
-
-  @column()
-  public coords: string
+  public profilePicture: string
 }

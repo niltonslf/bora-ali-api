@@ -1,7 +1,7 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'events'
+  protected tableName = 'users'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
@@ -9,10 +9,8 @@ export default class extends BaseSchema {
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
       table.string('name')
-      table.string('description')
-      table.string('image')
-      table.string('owner')
-      table.string('coords')
+      table.string('email')
+      table.string('profilePicture')
     })
   }
 
