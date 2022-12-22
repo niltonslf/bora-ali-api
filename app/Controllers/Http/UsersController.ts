@@ -13,6 +13,8 @@ export default class UsersController {
 
     const userExist = await this.getByUuid(body.uuid)
 
+    console.log({ userExist })
+
     if (userExist) {
       response.status(200)
       return userExist
@@ -21,7 +23,6 @@ export default class UsersController {
     const user = await User.create({ ...body })
 
     response.status(200)
-
     return user
   }
 
@@ -40,7 +41,7 @@ export default class UsersController {
 
   private async getByUuid(uuid) {
     try {
-      return await User.findByOrFail('uuid', uuid)
+      return await User.findBy('uuid', uuid)
     } catch (error) {
       return { response: error }
     }
