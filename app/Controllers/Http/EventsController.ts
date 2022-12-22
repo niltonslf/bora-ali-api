@@ -8,14 +8,23 @@ export default class EventsController {
   public async findAll({ response }: HttpContextContract) {
     let events = await Event.all()
 
-    events = events.map((event) => {
-      event.image = `/uploads/${event.image}`
-
-      return event
-    })
-
     response.status(200)
     return events
+  }
+
+  public async findById({ params, response }: HttpContextContract) {
+    try {
+      let event = await Event.findByOrFail('id', params.id)
+
+      if (event) {
+        response.status(200)
+        return event
+      }
+
+      response.status(404)
+    } catch (error) {
+      response.status(500)
+    }
   }
 
   public async store({ request, response }: HttpContextContract) {
@@ -29,7 +38,7 @@ export default class EventsController {
         name: imageName,
       })
 
-      Object.assign(body, { image: imageName })
+      Object.assign(body, { image: `/uploads/${imageName}` })
     }
 
     const event = await Event.create({ ...body })

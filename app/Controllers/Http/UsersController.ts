@@ -1,8 +1,4 @@
-import { uuid } from 'uuidv4'
-
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-
-import Application from '@ioc:Adonis/Core/Application'
 
 import User from 'App/Models/User'
 
@@ -12,29 +8,21 @@ export default class UsersController {
 
     if (!body) {
       response.status(400)
-      return {
-        data: { response: 'Erro ao resgatar os dados da request' },
-      }
+      return { response: 'Erro ao resgatar os dados da request' }
     }
 
-    const image = request.file('profilePicture', { size: '10mb' })
+    const userExist = await this.getByUuid(body.uuid)
 
-    if (image) {
-      const imageName = `${uuid()}.${image.extname}`
-      await image.move(Application.tmpPath('uploads'), {
-        name: imageName,
-      })
-
-      Object.assign(body, { profilePicture: imageName })
+    if (userExist) {
+      response.status(200)
+      return userExist
     }
 
     const user = await User.create({ ...body })
 
     response.status(200)
 
-    return {
-      data: user,
-    }
+    return user
   }
 
   public async getById({ params, response }: HttpContextContract) {
@@ -43,12 +31,18 @@ export default class UsersController {
 
       response.status(200)
 
-      user.profilePicture = `/uploads/${user.profilePicture}`
-
       return user
     } catch (error) {
       response.status(500)
-      return { data: { response: error } }
+      return { response: error }
+    }
+  }
+
+  private async getByUuid(uuid) {
+    try {
+      return await User.findByOrFail('uuid', uuid)
+    } catch (error) {
+      return { response: error }
     }
   }
 }

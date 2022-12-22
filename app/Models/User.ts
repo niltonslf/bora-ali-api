@@ -19,4 +19,7 @@ export default class User extends BaseModel {
 
   @column()
   public profilePicture: string
+
+  @column()
+  public uuid: string
 }
