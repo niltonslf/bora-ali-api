@@ -13,8 +13,6 @@ export default class UsersController {
 
     const userExist = await this.getByUuid(body.uuid)
 
-    console.log({ userExist })
-
     if (userExist) {
       response.status(200)
       return userExist
