@@ -14,7 +14,8 @@ export default class EventsController {
 
   public async findById({ params, response }: HttpContextContract) {
     try {
-      let event = await Event.findByOrFail('id', params.id)
+      let event = await Event.findBy('id', params.id)
+      await event?.load('images')
 
       if (event) {
         response.status(200)

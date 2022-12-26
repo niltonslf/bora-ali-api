@@ -13,4 +13,7 @@ export default class Image extends BaseModel {
 
   @column()
   public image: string
+
+  @column()
+  public eventId: string
 }

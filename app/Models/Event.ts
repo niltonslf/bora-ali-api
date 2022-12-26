@@ -1,5 +1,14 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasOne, HasOne, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  column,
+  HasMany,
+  hasMany,
+  hasOne,
+  HasOne,
+  ManyToMany,
+  manyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import Image from './Image'
 import Category from './Category'
 import User from './User'
@@ -20,8 +29,8 @@ export default class Event extends BaseModel {
   @column()
   public description: string
 
-  @manyToMany(() => Image)
-  public images: ManyToMany<typeof Image>
+  @hasMany(() => Image)
+  public images: HasMany<typeof Image>
 
   @hasOne(() => User)
   public userId: HasOne<typeof User>

@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at', { useTz: true })
       table.string('name')
       table.string('email')
-      table.string('profilePicture')
+      table.string('profile_picture')
       table.string('uuid')
     })
   }
