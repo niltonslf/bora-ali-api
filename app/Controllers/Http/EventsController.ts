@@ -1,5 +1,6 @@
 import Application from '@ioc:Adonis/Core/Application'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Category from 'App/Models/Category'
 
 import Event from 'App/Models/Event'
 import { uuid } from 'uuidv4'
@@ -31,18 +32,10 @@ export default class EventsController {
   public async store({ request, response }: HttpContextContract) {
     const body = request.body()
 
-    const image = request.file('images', { size: '10mb' })
+    const categories = body.categories?.split(',')
 
-    if (image) {
-      const imageName = `${uuid()}.${image.extname}`
-      await image.move(Application.tmpPath('uploads'), {
-        name: imageName,
-      })
-
-      Object.assign(body, { image: `/uploads/${imageName}` })
-    }
-
-    const event = await Event.create({ ...body })
+    const event = await Event.create(body)
+    await event.related('categories').attach(categories)
 
     response.status(200)
     return event
