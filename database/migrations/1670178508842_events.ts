@@ -15,10 +15,11 @@ export default class extends BaseSchema {
       table.string('address')
       table.string('price')
       table.boolean('has_meal')
-      table.string('music_style')
-      table.string('place_type')
       table.dateTime('start_date')
       table.dateTime('end_date')
+
+      table.integer('music_style_id').unsigned().references('music_styles.id').onDelete('CASCADE')
+      table.integer('place_type_id').unsigned().references('place_types.id').onDelete('CASCADE')
 
       table.integer('user_id').unsigned().references('users.id').onDelete('CASCADE')
     })

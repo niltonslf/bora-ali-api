@@ -12,6 +12,8 @@ import {
 import Image from './Image'
 import Category from './Category'
 import User from './User'
+import PlaceType from './PlaceType'
+import MusicStyle from './MusicStyle'
 
 export default class Event extends BaseModel {
   @column({ isPrimary: true })
@@ -50,14 +52,14 @@ export default class Event extends BaseModel {
   @column()
   public hasMeal: boolean
 
-  @column()
-  public musicStyle: string
+  @hasOne(() => MusicStyle)
+  public musicStyleId: HasOne<typeof MusicStyle>
 
   @manyToMany(() => Category)
   public categories: ManyToMany<typeof Category>
 
-  @column()
-  public placeType: string
+  @hasOne(() => PlaceType)
+  public placeTypeId: HasOne<typeof PlaceType>
 
   @column()
   public startDate: Date
