@@ -6,6 +6,12 @@ Route.group(() => {
   Route.get('/category', 'CategoriesController.findAll')
   Route.post('/category', 'CategoriesController.store')
 
+  Route.get('/place-type', 'PlaceTypesController.findAll')
+  Route.post('/place-type', 'PlaceTypesController.store')
+
+  Route.get('/music-style', 'MusicStylesController.findAll')
+  Route.post('/music-style', 'MusicStylesController.store')
+
   Route.get('/image', 'ImagesController.findAll')
   Route.post('/image', 'ImagesController.store')
 
