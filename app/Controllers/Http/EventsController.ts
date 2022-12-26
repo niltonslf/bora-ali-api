@@ -30,7 +30,7 @@ export default class EventsController {
   public async store({ request, response }: HttpContextContract) {
     const body = request.body()
 
-    const image = request.file('image', { size: '10mb' })
+    const image = request.file('images', { size: '10mb' })
 
     if (image) {
       const imageName = `${uuid()}.${image.extname}`

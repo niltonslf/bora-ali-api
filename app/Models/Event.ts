@@ -1,5 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, hasOne, HasOne, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import Image from './Image'
+import Category from './Category'
+import User from './User'
 
 export default class Event extends BaseModel {
   @column({ isPrimary: true })
@@ -12,17 +15,44 @@ export default class Event extends BaseModel {
   public updatedAt: DateTime
 
   @column()
-  public image: string
-
-  @column()
   public name: string
 
   @column()
   public description: string
 
-  @column()
-  public userId: string
+  @manyToMany(() => Image)
+  public images: ManyToMany<typeof Image>
+
+  @hasOne(() => User)
+  public userId: HasOne<typeof User>
 
   @column()
-  public coords: string
+  public lat: number
+
+  @column()
+  public lng: number
+
+  @column()
+  public address: string
+
+  @column()
+  public price: string
+
+  @column()
+  public hasMeal: boolean
+
+  @column()
+  public musicStyle: string
+
+  @manyToMany(() => Category)
+  public categories: ManyToMany<typeof Category>
+
+  @column()
+  public placeType: string
+
+  @column()
+  public startDate: Date
+
+  @column()
+  public endDate: Date
 }
