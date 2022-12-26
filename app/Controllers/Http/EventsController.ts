@@ -6,7 +6,7 @@ import { uuid } from 'uuidv4'
 
 export default class EventsController {
   public async findAll({ response }: HttpContextContract) {
-    let events = await Event.all()
+    let events = await Event.query().preload('images')
 
     response.status(200)
     return events
