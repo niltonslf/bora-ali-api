@@ -1,13 +1,10 @@
-import Application from '@ioc:Adonis/Core/Application'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Category from 'App/Models/Category'
 
 import Event from 'App/Models/Event'
-import { uuid } from 'uuidv4'
 
 export default class EventsController {
   public async findAll({ response }: HttpContextContract) {
-    let events = await Event.query().preload('images')
+    let events = await Event.query().preload('images').preload('categories')
 
     response.status(200)
     return events
@@ -17,6 +14,7 @@ export default class EventsController {
     try {
       let event = await Event.findBy('id', params.id)
       await event?.load('images')
+      await event?.load('categories')
 
       if (event) {
         response.status(200)
