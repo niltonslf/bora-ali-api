@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  BelongsTo,
+  belongsTo,
   column,
   HasMany,
   hasMany,
@@ -11,9 +13,9 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import Image from './Image'
 import Category from './Category'
-import User from './User'
 import PlaceType from './PlaceType'
 import MusicStyle from './MusicStyle'
+import User from './User'
 
 export default class Event extends BaseModel {
   @column({ isPrimary: true })
@@ -34,9 +36,6 @@ export default class Event extends BaseModel {
   @hasMany(() => Image)
   public images: HasMany<typeof Image>
 
-  @hasOne(() => User)
-  public userId: HasOne<typeof User>
-
   @column()
   public lat: number
 
@@ -52,14 +51,26 @@ export default class Event extends BaseModel {
   @column()
   public hasMeal: boolean
 
-  @hasOne(() => MusicStyle)
-  public musicStyleId: HasOne<typeof MusicStyle>
-
   @manyToMany(() => Category)
   public categories: ManyToMany<typeof Category>
 
-  @hasOne(() => PlaceType)
-  public placeTypeId: HasOne<typeof PlaceType>
+  @column()
+  public userId: number
+
+  @belongsTo(() => User)
+  public user: BelongsTo<typeof User>
+
+  @column()
+  public musicStyleId: number
+
+  @belongsTo(() => MusicStyle)
+  public musicStyle: BelongsTo<typeof MusicStyle>
+
+  @column()
+  public placeTypeId: number
+
+  @belongsTo(() => PlaceType)
+  public placeType: BelongsTo<typeof PlaceType>
 
   @column()
   public startDate: Date
