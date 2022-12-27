@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, hasOne, HasOne } from '@ioc:Adonis/Lucid/Orm'
+
+import Event from './Event'
 
 export default class Image extends BaseModel {
   @column({ isPrimary: true })
@@ -16,4 +18,7 @@ export default class Image extends BaseModel {
 
   @column()
   public eventId: string
+
+  @hasOne(() => Event)
+  public event: HasOne<typeof Event>
 }

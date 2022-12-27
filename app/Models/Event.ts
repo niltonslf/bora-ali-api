@@ -6,8 +6,6 @@ import {
   column,
   HasMany,
   hasMany,
-  hasOne,
-  HasOne,
   ManyToMany,
   manyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
@@ -33,9 +31,6 @@ export default class Event extends BaseModel {
   @column()
   public description: string
 
-  @hasMany(() => Image)
-  public images: HasMany<typeof Image>
-
   @column()
   public lat: number
 
@@ -53,6 +48,9 @@ export default class Event extends BaseModel {
 
   @manyToMany(() => Category)
   public categories: ManyToMany<typeof Category>
+
+  @hasMany(() => Image)
+  public images: HasMany<typeof Image>
 
   @column()
   public userId: number
