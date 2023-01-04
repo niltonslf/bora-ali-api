@@ -47,7 +47,7 @@ export default class EventsController {
     const event = await Event.create(body)
     await event.related('categories').attach(categories)
 
-    const files = request.files('images', { size: '10mb' })
+    const files = request.files('images', { size: '50mb' })
 
     if (files) {
       const images = files.map(async (file) => {

@@ -15,6 +15,9 @@ export default class PlaceType extends BaseModel {
   @column()
   public name: string
 
+  @column()
+  public description: string
+
   @hasMany(() => Event)
   public events: HasMany<typeof Event>
 }

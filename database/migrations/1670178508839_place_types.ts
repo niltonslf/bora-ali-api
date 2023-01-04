@@ -14,6 +14,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at', { useTz: true })
 
       table.string('name')
+      table.string('description')
     })
   }
 
