@@ -15,9 +15,10 @@ Route.group(() => {
   Route.get('/image', 'ImagesController.findAll')
   Route.post('/image', 'ImagesController.store')
 
-  Route.post('/event', 'EventsController.store')
   Route.get('/event', 'EventsController.findAll')
+  Route.get('/event/location', 'EventsController.findByLocation')
   Route.get('/event/:id', 'EventsController.findById')
+  Route.post('/event', 'EventsController.store')
 
   Route.group(() => {
     Route.get('/user/:id', 'UsersController.getById')
