@@ -1,12 +1,65 @@
 import Application from '@ioc:Adonis/Core/Application'
 
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
+import Category from 'App/Models/Category'
 
 import Event from 'App/Models/Event'
 import Image from 'App/Models/Image'
+import MusicStyle from 'App/Models/MusicStyle'
+import PlaceType from 'App/Models/PlaceType'
+import User from 'App/Models/User'
 import { uuid } from 'uuidv4'
 
 export default class EventsController {
+  public async findByLocation({ request, response }: HttpContextContract) {
+    const { lat, lng, radius } = request.qs()
+
+    const queryResult = await Database.rawQuery(
+      `
+      SELECT *, ST_Distance_Sphere(point (:lng, :lat),
+      point(lng, lat)) * 0.001 as distance_in_kms
+      FROM events
+      HAVING distance_in_kms <= :radius
+      ORDER BY distance_in_kms asc
+`,
+      { lng, lat, radius }
+    )
+
+    const eventsRes = queryResult[0]
+
+    const res = eventsRes.map(async (event) => {
+      const images = await Image.query().where('eventId', '=', event.id)
+      const categories = await Category.query()
+        .join('category_event', 'categories.id', 'category_event.category_id')
+        .where('category_event.event_id', '=', event.id)
+
+      const musicStyle = await MusicStyle.query().where('id', '=', event.music_style_id).first()
+      const placeType = await PlaceType.query().where('id', '=', event.place_type_id).first()
+      const user = await User.query().where('id', '=', event.user_id).first()
+
+      Object.assign(event, { images, categories, musicStyle, placeType, user })
+
+      return this.parseData(event)
+    })
+    const events = await Promise.all(res)
+
+    response.status(200)
+    return events
+  }
+
+  private parseData(event) {
+    return {
+      ...event,
+      id: event.id,
+      createdAt: event.created_at,
+      updatedAt: event.updated_at,
+      hasMeal: event.has_meal,
+      startDate: event.start_date,
+      endDate: event.end_date,
+    }
+  }
+
   public async findAll({ response }: HttpContextContract) {
     let events = await Event.query()
       .preload('images')
