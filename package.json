@@ -7,8 +7,7 @@
     "build": "node ace build --production",
     "start": "node server.js",
     "lint": "eslint . --ext=.ts",
-    "format": "prettier --write .",
-    "postinstall": "cp service-account-key.json ./build"
+    "format": "prettier --write ."
   },
   "eslintConfig": {
     "extends": [
