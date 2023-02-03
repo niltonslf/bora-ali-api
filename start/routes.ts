@@ -22,5 +22,5 @@ Route.group(() => {
 
   Route.group(() => {
     Route.get('/user/:id', 'UsersController.getById')
-  }).middleware('auth')
+  })
 }).prefix('/api')
