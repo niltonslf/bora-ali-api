@@ -97,7 +97,10 @@ export default class EventsController {
 
     const categories = body.categories?.split(',')
 
-    const event = await Event.create(body)
+    const event = await Event.create({
+      ...body,
+      hasMeal: Boolean(body.has_meal),
+    })
     await event.related('categories').attach(categories)
 
     const files = request.files('images', { size: '50mb' })
