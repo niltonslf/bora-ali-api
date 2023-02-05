@@ -60,13 +60,23 @@ export default class EventsController {
     }
   }
 
-  public async findAll({ response }: HttpContextContract) {
-    let events = await Event.query()
+  public async findAll({ request, response }: HttpContextContract) {
+    const params = request.qs()
+
+    let eventsQuery = Event.query()
+
+    if (params.userId) {
+      eventsQuery.where('user_id', params.userId)
+    }
+
+    eventsQuery
       .preload('images')
       .preload('categories')
       .preload('musicStyle')
       .preload('placeType')
       .preload('user')
+
+    const events = await eventsQuery
 
     response.status(200)
     return events
