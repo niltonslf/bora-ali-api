@@ -10,7 +10,7 @@ phases:
     commands:
       - yarn build
   build:
-    baseDirectory: dist
+    baseDirectory: build
     commands:
       - echo "⚙️ installing build project"
       - yarn install --production
@@ -18,6 +18,6 @@ phases:
     commands:
     - echo "✅ Post build successful"
 artifacts:
-  baseDirectory: dist
+  baseDirectory: build
   files:
     - '**/*'
