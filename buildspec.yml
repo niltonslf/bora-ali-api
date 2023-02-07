@@ -8,6 +8,7 @@ phases:
       - yarn install
   pre_build:
     commands:
+      - yarn add @adonisjs/assembler --save-dev
       - yarn build
   build:
     baseDirectory: build
