@@ -10,9 +10,9 @@ phases:
     commands:
       - yarn build
   build:
+    baseDirectory: dist
     commands:
       - echo "⚙️ installing build project"
-      - cd dist
       - yarn install --production
   post_build:
     commands:
