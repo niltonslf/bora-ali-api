@@ -10,6 +10,7 @@ phases:
       - yarn build
   build:
     commands:
+      - echo "⚙️ installing build project"
       - cd dist && yarn install --production
   artifacts:
     baseDirectory: dist
