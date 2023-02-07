@@ -12,7 +12,8 @@ phases:
   build:
     commands:
       - echo "⚙️ installing build project"
-      - cd dist && yarn install --production
+      - cd dist
+      - yarn install --production
   post_build:
     commands:
     - echo "✅ Post build successful"
