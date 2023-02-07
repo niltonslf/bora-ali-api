@@ -1,20 +1,22 @@
 version: 0.2
+
 phases:
   install:
     runtime-versions:
       nodejs: 18
     commands:
       - yarn install
-    preBuild:
-      commands:
-        - yarn build
-    build:
-      commands:
-        - cd dist && yarn install --production
+  pre_build:
+    commands:
+      - yarn build
+  build:
+    commands:
+      - cd dist && yarn install --production
+  base-directory: dist
   artifacts:
-    baseDirectory: dist
     files:
       - '**/*'
   cache:
     paths:
-      - node_modules/**/*
+    - node_modules/**/*
+
