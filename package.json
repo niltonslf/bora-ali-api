@@ -7,8 +7,7 @@
   },
   "scripts": {
     "dev": "node ace serve --watch",
-    "build": "node ace build --production & yarn copy",
-    "copy": "cp firebase-admin.json /build",
+    "build": "node ace build --production",
     "start": "node build/server.js",
     "lint": "eslint . --ext=.ts",
     "format": "prettier --write ."

@@ -3,8 +3,6 @@ import { CamelCaseNamingStrategy } from './CamelCaseNamingStrategy'
 
 import * as admin from 'firebase-admin'
 
-import serviceAccount from '../firebase-admin.json'
-
 export default class AppProvider {
   constructor(protected app: ApplicationContract) {}
 
@@ -18,8 +16,13 @@ export default class AppProvider {
   }
 
   public async ready() {
+    const serviceAccount = Buffer.from(
+      process.env.FIREBASE_ADMIN_CONFIG_BASE64 as any,
+      'base64'
+    ).toString('ascii')
+
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount as any),
+      credential: admin.credential.cert(JSON.parse(serviceAccount)),
     })
   }
 
