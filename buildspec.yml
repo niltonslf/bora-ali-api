@@ -18,6 +18,6 @@ phases:
     commands:
     - echo "✅ Post build successful"
 artifacts:
-  baseDirectory: build
+  baseDirectory: ./
   files:
     - '**/*'
