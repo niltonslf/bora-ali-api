@@ -6,4 +6,4 @@ coverage
 .env
 tmp
 
-service-account-key.json
+firebase-admin.json

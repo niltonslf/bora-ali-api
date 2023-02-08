@@ -1,6 +1,10 @@
 import type { ApplicationContract } from '@ioc:Adonis/Core/Application'
 import { CamelCaseNamingStrategy } from './CamelCaseNamingStrategy'
 
+import * as admin from 'firebase-admin'
+
+import serviceAccount from '../firebase-admin.json'
+
 export default class AppProvider {
   constructor(protected app: ApplicationContract) {}
 
@@ -14,7 +18,9 @@ export default class AppProvider {
   }
 
   public async ready() {
-    // App is ready
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount as any),
+    })
   }
 
   public async shutdown() {
