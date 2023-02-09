@@ -10,8 +10,9 @@ export default class extends BaseSchema {
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
 
-      table.integer('event_id').unsigned().references('events.id')
-      table.integer('category_id').unsigned().references('categories.id')
+      table.integer('event_id').unsigned().references('events.id').onDelete('CASCADE')
+      table.integer('category_id').unsigned().references('categories.id').onDelete('CASCADE')
+
       table.unique(['event_id', 'category_id'])
     })
   }

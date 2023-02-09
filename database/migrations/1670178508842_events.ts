@@ -10,17 +10,20 @@ export default class extends BaseSchema {
       table.timestamp('updated_at', { useTz: true })
       table.string('name')
       table.text('description')
+
       table.string('lat')
       table.string('lng')
       table.string('address')
+
       table.string('price')
       table.boolean('has_meal')
-      table.string('start_date')
-      table.string('end_date')
+
+      table.dateTime('start_date', { useTz: true })
+      table.dateTime('end_date', { useTz: true }).nullable()
+      table.string('repeat_days').nullable()
 
       table.integer('music_style_id').unsigned().references('music_styles.id').onDelete('CASCADE')
       table.integer('place_type_id').unsigned().references('place_types.id').onDelete('CASCADE')
-
       table.integer('user_id').unsigned().references('users.id').onDelete('CASCADE')
     })
   }
