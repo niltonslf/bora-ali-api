@@ -29,8 +29,7 @@ export default class FirebaseAuth {
 
       await next()
     } catch (err) {
-      console.error(`${err.code} -  ${err.message}`)
-      return response.status(401).send({ message: 'Unauthorized' })
+      return response.status(500).send({ code: err.code, message: err.message })
     }
   }
 }

@@ -71,8 +71,11 @@ export default class Event extends BaseModel {
   public placeType: BelongsTo<typeof PlaceType>
 
   @column()
-  public startDate: string
+  public startDate: DateTime
 
   @column()
-  public endDate: string
+  public endDate: DateTime
+
+  @column()
+  public repeatDays: string
 }

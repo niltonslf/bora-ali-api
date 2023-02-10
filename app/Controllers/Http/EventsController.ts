@@ -15,20 +15,44 @@ export default class EventsController {
   public async findByLocation({ request, response }: HttpContextContract) {
     const { lat, lng, radius } = request.qs()
 
-    const queryResult = await Database.rawQuery(
+    const currentAndFutureEventsQuery = await Database.rawQuery(
       `
-      SELECT *, ST_Distance_Sphere(point (:lng, :lat),
-      point(lng, lat)) * 0.001 as distance_in_kms
-      FROM events
-      HAVING distance_in_kms <= :radius
-      ORDER BY distance_in_kms asc
+        SELECT *, ST_Distance_Sphere(point (:lng, :lat), point(lng, lat)) * 0.001 as distance_in_kms,
+        LOCATE(LOWER(DATE_FORMAT(CURDATE(), '%W')),repeat_days) as matchIndex
+        FROM events
+        WHERE repeat_days is null
+        and ( start_date >= CURDATE() or (start_date <= CURDATE() and end_date >= CURDATE() or end_date is null))
+        HAVING distance_in_kms <= :radius
+        ORDER BY distance_in_kms asc
 `,
       { lng, lat, radius }
     )
 
-    const eventsRes = queryResult[0]
+    const repeatEventsQuery = await Database.rawQuery(
+      `
+        SELECT *, ST_Distance_Sphere(point (:lng, :lat), point(lng, lat)) * 0.001 as distance_in_kms,
+        LOCATE(LOWER(DATE_FORMAT(CURDATE(), '%W')),repeat_days) as matchIndex
+        FROM events
+        where repeat_days is not null
+        and start_date <= CURDATE() and (end_date >= CURDATE() or end_date is null)
+        HAVING (distance_in_kms <= :radius and matchIndex > 0)
+        ORDER BY distance_in_kms asc;
+`,
+      { lng, lat, radius }
+    )
 
-    const res = eventsRes.map(async (event) => {
+    const resCurrentAndFuture = this.fetchEventsDependencies(currentAndFutureEventsQuery[0])
+    const resRepeat = this.fetchEventsDependencies(repeatEventsQuery[0])
+
+    const currentAndFutureEvents = await Promise.all(resCurrentAndFuture)
+    const repeatEvents = await Promise.all(resRepeat)
+
+    response.status(200)
+    return [...currentAndFutureEvents, ...repeatEvents]
+  }
+
+  private fetchEventsDependencies(events) {
+    return events.map(async (event) => {
       const images = await Image.query().where('eventId', '=', event.id)
       const categories = await Category.query()
         .join('category_event', 'categories.id', 'category_event.category_id')
@@ -42,10 +66,6 @@ export default class EventsController {
 
       return this.parseData(event)
     })
-    const events = await Promise.all(res)
-
-    response.status(200)
-    return events
   }
 
   private parseData(event) {
@@ -110,6 +130,7 @@ export default class EventsController {
     const event = await Event.create({
       ...body,
       hasMeal: Boolean(body.has_meal),
+      endDate: body.endDate === 'null' ? null : body.endDate,
     })
     await event.related('categories').attach(categories)
 
