@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
 
-      table.string('image')
+      table.text('image')
       table.integer('event_id').unsigned().references('events.id').onDelete('CASCADE') // delete post when user is deleted
     })
   }

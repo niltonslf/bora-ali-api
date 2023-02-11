@@ -126,12 +126,16 @@ export default class EventsController {
     const body = request.body()
 
     const categories = body.categories?.split(',')
+    const imagesUrl = body.imagesUrl?.split(',') || []
+
+    delete body.imagesUrl
 
     const event = await Event.create({
       ...body,
       hasMeal: Boolean(body.has_meal),
       endDate: body.endDate === 'null' ? null : body.endDate,
     })
+
     await event.related('categories').attach(categories)
 
     const files = request.files('images', { size: '50mb' })
@@ -151,6 +155,17 @@ export default class EventsController {
       }))
 
       await Image.createMany(imageBody as any)
+    }
+
+    if (imagesUrl) {
+      console.log(imagesUrl)
+
+      const googleImages = imagesUrl.map((image) => ({
+        image: image,
+        eventId: event.id,
+      }))
+
+      await Image.createMany(googleImages as any)
     }
 
     response.status(200)
