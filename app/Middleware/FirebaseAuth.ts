@@ -29,7 +29,7 @@ export default class FirebaseAuth {
 
       await next()
     } catch (err) {
-      return response.status(500).send({ code: err.code, message: err.message })
+      return response.status(403).send({ code: err.code, message: err.message })
     }
   }
 }
