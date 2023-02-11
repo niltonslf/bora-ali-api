@@ -21,7 +21,7 @@ export default class EventsController {
         LOCATE(LOWER(DATE_FORMAT(CURDATE(), '%W')),repeat_days) as matchIndex
         FROM events
         WHERE repeat_days is null
-        and ( start_date >= CURDATE() or (start_date <= CURDATE() and end_date >= CURDATE() or end_date is null))
+        and ( DATE(start_date) >= CURDATE() or (DATE(start_date) <= CURDATE() and DATE(end_date) >= CURDATE() or end_date is null))
         HAVING distance_in_kms <= :radius
         ORDER BY distance_in_kms asc
 `,
@@ -34,7 +34,7 @@ export default class EventsController {
         LOCATE(LOWER(DATE_FORMAT(CURDATE(), '%W')),repeat_days) as matchIndex
         FROM events
         where repeat_days is not null
-        and start_date <= CURDATE() and (end_date >= CURDATE() or end_date is null)
+        and DATE(start_date) <= CURDATE() and (DATE(end_date) >= CURDATE() or end_date is null)
         HAVING (distance_in_kms <= :radius and matchIndex > 0)
         ORDER BY distance_in_kms asc;
 `,
