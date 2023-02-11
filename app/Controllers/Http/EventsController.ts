@@ -158,8 +158,6 @@ export default class EventsController {
     }
 
     if (imagesUrl) {
-      console.log(imagesUrl)
-
       const googleImages = imagesUrl.map((image) => ({
         image: image,
         eventId: event.id,
