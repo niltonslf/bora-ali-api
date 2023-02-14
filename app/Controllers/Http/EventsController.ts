@@ -1,4 +1,5 @@
 import Application from '@ioc:Adonis/Core/Application'
+import Drive from '@ioc:Adonis/Core/Drive'
 
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
@@ -185,8 +186,16 @@ export default class EventsController {
     if (files) {
       const images = files.map(async (file) => {
         const imageName = `${uuid()}.${file.extname}`
-        await file.move(Application.tmpPath('uploads'), { name: imageName })
-        return `/uploads/${imageName}`
+
+        try {
+          const res = await file.moveToDisk('images', { name: imageName }, 's3')
+
+          console.log({ res })
+
+          return imageName
+        } catch (error) {
+          console.log(error)
+        }
       })
 
       const imageRes = await Promise.all(images)
