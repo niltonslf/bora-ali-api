@@ -1,6 +1,3 @@
-import Application from '@ioc:Adonis/Core/Application'
-import Drive from '@ioc:Adonis/Core/Drive'
-
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Category from 'App/Models/Category'
