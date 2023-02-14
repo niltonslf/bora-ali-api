@@ -13,7 +13,7 @@ import { uuid } from 'uuidv4'
 
 export default class EventsController {
   public async findByLocation({ request, response }: HttpContextContract) {
-    const { lat, lng, radius } = request.qs()
+    const { lat, lng, radius, category, placeType, musicStyle } = request.qs()
 
     const currentAndFutureEventsQuery = await Database.rawQuery(
       `
@@ -44,8 +44,50 @@ export default class EventsController {
     const resCurrentAndFuture = this.fetchEventsDependencies(currentAndFutureEventsQuery[0])
     const resRepeat = this.fetchEventsDependencies(repeatEventsQuery[0])
 
-    const currentAndFutureEvents = await Promise.all(resCurrentAndFuture)
-    const repeatEvents = await Promise.all(resRepeat)
+    let currentAndFutureEvents = await Promise.all(resCurrentAndFuture)
+    let repeatEvents = await Promise.all(resRepeat)
+
+    if (category) {
+      currentAndFutureEvents = currentAndFutureEvents.filter((event) => {
+        const res = event.categories.find((cat) => cat.name === category)
+        if (res) return event
+        return null
+      })
+
+      repeatEvents = repeatEvents.filter((event) => {
+        const res = event.categories.find((cat) => cat.name === category)
+        if (res) return event
+        return null
+      })
+    }
+
+    if (placeType) {
+      currentAndFutureEvents = currentAndFutureEvents.filter((event) => {
+        const res = event.placeType.name === placeType
+        if (res) return event
+        return null
+      })
+
+      repeatEvents = repeatEvents.filter((event) => {
+        const res = event.placeType.name === placeType
+        if (res) return event
+        return null
+      })
+    }
+
+    if (musicStyle) {
+      currentAndFutureEvents = currentAndFutureEvents.filter((event) => {
+        const res = event.musicStyle.name === musicStyle
+        if (res) return event
+        return null
+      })
+
+      repeatEvents = repeatEvents.filter((event) => {
+        const res = event.musicStyle.name === musicStyle
+        if (res) return event
+        return null
+      })
+    }
 
     response.status(200)
     return [...currentAndFutureEvents, ...repeatEvents]
