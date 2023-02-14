@@ -100,7 +100,7 @@ export default driveConfig({
       secret: Env.get('S3_SECRET'),
       region: Env.get('S3_REGION'),
       bucket: Env.get('S3_BUCKET'),
-      endpoint: Env.get('S3_ENDPOINT'),
+      // endpoint: Env.get('S3_ENDPOINT'),
       // forcePathStyle: true,
     },
   },
