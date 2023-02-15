@@ -8,6 +8,7 @@ import MusicStyle from 'App/Models/MusicStyle'
 import PlaceType from 'App/Models/PlaceType'
 import User from 'App/Models/User'
 import { v4 as uuid } from 'uuid'
+import ImageUploaderController from './ImageUploadersController'
 
 export default class EventsController {
   public async findByLocation({ request, response }: HttpContextContract) {
@@ -182,26 +183,8 @@ export default class EventsController {
     const files = request.files('images', { size: '50mb' })
 
     if (files) {
-      const images = files.map(async (file) => {
-        const imageName = `${uuid()}.${file.extname}`
-
-        try {
-          const res = await file.moveToDisk('images', { name: imageName }, 'local')
-
-          console.log({ res })
-
-          return imageName
-        } catch (error) {
-          console.log(error)
-        }
-      })
-
-      const imageRes = await Promise.all(images)
-
-      const imageBody = imageRes.map((image) => ({
-        image: image,
-        eventId: event.id,
-      }))
+      const imageRes = await ImageUploaderController.UploadImages(files)
+      const imageBody = imageRes.map((image) => ({ image, eventId: event.id }))
 
       await Image.createMany(imageBody as any)
     }
@@ -253,24 +236,8 @@ export default class EventsController {
     const files = request.files('images', { size: '50mb' })
 
     if (files) {
-      const images = files.map(async (file) => {
-        try {
-          const imageName = `${uuid()}.${file.extname}`
-
-          await file.moveToDisk('./', { name: imageName })
-
-          return imageName
-        } catch (error) {
-          console.log(error)
-        }
-      })
-
-      const imageRes = await Promise.all(images)
-
-      const imageBody = imageRes.map((image) => ({
-        image: image,
-        eventId: event.id,
-      }))
+      const imageRes = await ImageUploaderController.UploadImages(files)
+      const imageBody = imageRes.map((image) => ({ image, eventId: event.id }))
 
       await Image.createMany(imageBody as any)
     }
