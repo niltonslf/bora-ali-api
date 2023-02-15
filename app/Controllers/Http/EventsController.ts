@@ -243,12 +243,10 @@ export default class EventsController {
     }
 
     if (imagesUrl) {
-      const googleImages = imagesUrl.map((image) => ({
-        image: image,
-        eventId: event.id,
-      }))
+      const imageRes = await ImageUploaderController.DownloadFromSource(imagesUrl)
+      const imageBody = imageRes.map((image) => ({ image, eventId: event.id }))
 
-      await Image.createMany(googleImages as any)
+      await Image.createMany(imageBody as any)
     }
 
     response.status(200)
