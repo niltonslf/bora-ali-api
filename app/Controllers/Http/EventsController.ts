@@ -174,6 +174,7 @@ export default class EventsController {
       ...body,
       hasMeal: Boolean(body.has_meal),
       endDate: body.endDate === 'null' ? null : body.endDate,
+      repeatDays: body.repeatDays === 'null' ? null : body.repeatDays,
     })
 
     await event.related('categories').attach(categories)
@@ -185,7 +186,78 @@ export default class EventsController {
         const imageName = `${uuid()}.${file.extname}`
 
         try {
-          const res = await file.moveToDisk('images', { name: imageName }, 's3')
+          const res = await file.moveToDisk('images', { name: imageName }, 'local')
+
+          console.log({ res })
+
+          return imageName
+        } catch (error) {
+          console.log(error)
+        }
+      })
+
+      const imageRes = await Promise.all(images)
+
+      const imageBody = imageRes.map((image) => ({
+        image: image,
+        eventId: event.id,
+      }))
+
+      await Image.createMany(imageBody as any)
+    }
+
+    if (imagesUrl) {
+      const googleImages = imagesUrl.map((image) => ({
+        image: image,
+        eventId: event.id,
+      }))
+
+      await Image.createMany(googleImages as any)
+    }
+
+    response.status(200)
+    return event
+  }
+
+  public async update({ request, response }: HttpContextContract) {
+    const body = request.body()
+
+    const categories = body.categories?.split(',')
+    const imagesUrl = body.imagesUrl?.split(',') || []
+
+    const eventId = body.id
+    delete body.imagesUrl
+    delete body.id
+
+    const event = await Event.updateOrCreate(
+      { id: eventId },
+      {
+        ...body,
+        hasMeal: Boolean(body.has_meal),
+        endDate: body.endDate === 'null' ? null : body.endDate,
+        repeatDays: body.repeatDays === 'null' ? null : body.repeatDays,
+      }
+    )
+
+    categories.map(async (category) => {
+      const resCategory = await event
+        .related('categories')
+        .query()
+        .where('category_id', category)
+        .andWhere('event_id', eventId)
+        .first()
+
+      if (!resCategory) await event.related('categories').attach([category])
+    })
+
+    const files = request.files('images', { size: '50mb' })
+
+    if (files) {
+      const images = files.map(async (file) => {
+        const imageName = `${uuid()}.${file.extname}`
+
+        try {
+          const res = await file.moveToDisk('images', { name: imageName }, 'local')
 
           console.log({ res })
 
