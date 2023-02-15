@@ -7,7 +7,7 @@ import Image from 'App/Models/Image'
 import MusicStyle from 'App/Models/MusicStyle'
 import PlaceType from 'App/Models/PlaceType'
 import User from 'App/Models/User'
-import { uuid } from 'uuidv4'
+import { v4 as uuid } from 'uuid'
 
 export default class EventsController {
   public async findByLocation({ request, response }: HttpContextContract) {
@@ -254,12 +254,10 @@ export default class EventsController {
 
     if (files) {
       const images = files.map(async (file) => {
-        const imageName = `${uuid()}.${file.extname}`
-
         try {
-          const res = await file.moveToDisk('images', { name: imageName }, 'local')
+          const imageName = `${uuid()}.${file.extname}`
 
-          console.log({ res })
+          await file.moveToDisk('./', { name: imageName })
 
           return imageName
         } catch (error) {
