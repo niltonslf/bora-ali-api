@@ -7,7 +7,6 @@ import Image from 'App/Models/Image'
 import MusicStyle from 'App/Models/MusicStyle'
 import PlaceType from 'App/Models/PlaceType'
 import User from 'App/Models/User'
-import { v4 as uuid } from 'uuid'
 import ImageUploaderController from './ImageUploadersController'
 
 export default class EventsController {
