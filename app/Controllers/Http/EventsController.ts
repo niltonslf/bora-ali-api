@@ -189,12 +189,14 @@ export default class EventsController {
     }
 
     if (imagesUrl) {
-      const googleImages = imagesUrl.map((image) => ({
-        image: image,
-        eventId: event.id,
-      }))
+      const imageRes = await ImageUploaderController.DownloadFromSource(imagesUrl)
 
-      await Image.createMany(googleImages as any)
+      if (!imageRes.length) return
+
+      const imageBody = imageRes.map((image) => ({ image, eventId: event.id }))
+
+      await Image.query().where('event_id', event.id).delete()
+      await Image.createMany(imageBody as any)
     }
 
     response.status(200)
@@ -232,6 +234,10 @@ export default class EventsController {
       if (!resCategory) await event.related('categories').attach([category])
     })
 
+    if (imagesUrl.length === 0) {
+      await Image.query().where('event_id', event.id).delete()
+    }
+
     const files = request.files('images', { size: '50mb' })
 
     if (files) {
@@ -241,14 +247,18 @@ export default class EventsController {
       await Image.createMany(imageBody as any)
     }
 
-    if (imagesUrl) {
-      const imageRes = await ImageUploaderController.DownloadFromSource(imagesUrl)
-      const imageBody = imageRes.map((image) => ({ image, eventId: event.id }))
-
-      await Image.createMany(imageBody as any)
-    }
+    console.log(imagesUrl.length)
 
     response.status(200)
     return event
+  }
+
+  public async delete({ request, response }: HttpContextContract) {
+    const params = request.params()
+
+    const res = await Event.query().where('id', params.eventId).delete()
+
+    response.status(200)
+    return res
   }
 }

@@ -22,7 +22,8 @@ Route.group(() => {
     Route.get('/event/location', 'EventsController.findByLocation')
     Route.get('/event/:id', 'EventsController.findById')
     Route.post('/event', 'EventsController.store')
-    Route.put('/event', 'EventsController.update')
+    Route.put('/event/:eventId', 'EventsController.update')
+    Route.delete('/event/:eventId', 'EventsController.delete')
 
     Route.get('/user/:id', 'UsersController.getById')
   }).middleware(['firebaseAuth'])
