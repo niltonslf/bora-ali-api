@@ -18,8 +18,10 @@ export default class extends BaseSchema {
       table.string('price')
       table.boolean('has_meal')
 
-      table.dateTime('start_date', { useTz: true })
-      table.dateTime('end_date', { useTz: true }).nullable()
+      table.date('start_date')
+      table.date('end_date').nullable()
+      table.time('start_time')
+      table.time('end_time').nullable()
       table.string('repeat_days').nullable()
 
       table.integer('music_style_id').unsigned().references('music_styles.id').onDelete('CASCADE')

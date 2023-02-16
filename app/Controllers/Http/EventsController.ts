@@ -117,6 +117,8 @@ export default class EventsController {
       hasMeal: event.has_meal,
       startDate: event.start_date,
       endDate: event.end_date,
+      endTime: event.end_time,
+      startTime: event.start_time,
     }
   }
 

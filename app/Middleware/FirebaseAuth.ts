@@ -18,6 +18,7 @@ export default class FirebaseAuth {
       return response.status(401).send({
         message: 'Unauthorized',
       })
+
     try {
       const token = split[1]
 
@@ -26,10 +27,10 @@ export default class FirebaseAuth {
       const user = await User.query().where('uuid', decodedToken.uid).first()
 
       if (!user) throw Error('user not found')
-
-      await next()
     } catch (err) {
       return response.status(403).send({ code: err.code, message: err.message })
     }
+
+    await next()
   }
 }
