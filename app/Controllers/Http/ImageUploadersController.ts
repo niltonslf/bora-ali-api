@@ -3,17 +3,41 @@ import { v4 as uuid } from 'uuid'
 import Downloader from 'image-downloader'
 import Application from '@ioc:Adonis/Core/Application'
 
+import { S3 } from '@aws-sdk/client-s3'
+
+import fs from 'fs'
+
 import Drive from '@ioc:Adonis/Core/Drive'
 
 export default class ImageUploaderController {
+  public static initAwsS3() {
+    const s3Client = new S3({
+      region: process.env.S3_REGION,
+      credentials: {
+        accessKeyId: process.env.S3_KEY as string,
+        secretAccessKey: process.env.S3_SECRET as string,
+      },
+    })
+
+    return s3Client
+  }
+
   /**
    * UploadImage
    */
   public static async UploadImages(files: MultipartFileContract[]): Promise<string[]> {
     const images = files.map(async (file) => {
       const imageName = `${uuid()}.${file.extname}`
-      await file.moveToDisk('./', { name: imageName })
-      return imageName
+      const fileBuffer = fs.readFileSync(file.tmpPath as string)
+
+      await this.initAwsS3().putObject({
+        Bucket: process.env.S3_BUCKET,
+        Body: fileBuffer,
+        Key: imageName,
+        ACL: 'public-read',
+      })
+
+      return `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${imageName}`
     })
 
     return await Promise.all(images)
@@ -22,16 +46,25 @@ export default class ImageUploaderController {
   public static async DownloadFromSource(filesUrl: string[]): Promise<string[]> {
     const images = filesUrl.map(async (fileUrl) => {
       const fileName = fileUrl?.split('/').at(-1) as string
+      const [, extension] = fileName.split('.')
 
-      const fileExists = await Drive.exists(fileName)
+      const imageName = `${uuid()}.${extension}`
+      const imagePath = `${Application.tmpPath('uploads')}/${imageName}`
 
-      if (!fileExists) {
-        const imageName = `${uuid()}.jpg`
-        Downloader.image({ url: fileUrl, dest: `${Application.tmpPath('uploads')}/${imageName}` })
+      Downloader.image({ url: fileUrl, dest: imagePath })
 
-        return imageName
-      }
-      return ''
+      const fileBuffer = fs.readFileSync(imagePath)
+
+      await this.initAwsS3().putObject({
+        Bucket: process.env.S3_BUCKET,
+        Body: fileBuffer,
+        Key: imageName,
+        ACL: 'public-read',
+      })
+
+      await Drive.delete(imagePath)
+
+      return `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${imageName}`
     })
 
     return await (await Promise.all(images)).filter((image) => image !== '')
