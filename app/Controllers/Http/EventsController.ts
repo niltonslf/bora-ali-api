@@ -249,8 +249,6 @@ export default class EventsController {
       await Image.createMany(imageBody as any)
     }
 
-    console.log(imagesUrl.length)
-
     response.status(200)
     return event
   }

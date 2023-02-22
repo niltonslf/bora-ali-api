@@ -45,13 +45,10 @@ export default class ImageUploaderController {
 
   public static async DownloadFromSource(filesUrl: string[]): Promise<string[]> {
     const images = filesUrl.map(async (fileUrl) => {
-      const fileName = fileUrl?.split('/').at(-1) as string
-      const [, extension] = fileName.split('.')
-
-      const imageName = `${uuid()}.${extension}`
+      const imageName = `${uuid()}.jpg`
       const imagePath = `${Application.tmpPath('uploads')}/${imageName}`
 
-      Downloader.image({ url: fileUrl, dest: imagePath })
+      await Downloader.image({ url: fileUrl, dest: imagePath })
 
       const fileBuffer = fs.readFileSync(imagePath)
 
