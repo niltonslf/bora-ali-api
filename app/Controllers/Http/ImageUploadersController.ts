@@ -59,7 +59,11 @@ export default class ImageUploaderController {
         ACL: 'public-read',
       })
 
-      await Drive.delete(imagePath)
+      try {
+        await Drive.delete(imagePath)
+      } catch (error) {
+        console.log({ error })
+      }
 
       return `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${imageName}`
     })
