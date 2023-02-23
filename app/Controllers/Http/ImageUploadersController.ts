@@ -48,7 +48,11 @@ export default class ImageUploaderController {
       const imageName = `${uuid()}.jpg`
       const imagePath = `${Application.tmpPath('uploads')}/${imageName}`
 
-      await Downloader.image({ url: fileUrl, dest: imagePath })
+      try {
+        await Downloader.image({ url: fileUrl, dest: imagePath })
+      } catch (error) {
+        console.log({ error })
+      }
 
       const fileBuffer = fs.readFileSync(imagePath)
 
