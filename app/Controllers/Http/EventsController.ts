@@ -177,6 +177,7 @@ export default class EventsController {
       hasMeal: Boolean(body.has_meal),
       endDate: body.endDate === 'null' ? null : body.endDate,
       repeatDays: body.repeatDays === 'null' ? null : body.repeatDays,
+      isPrivate: body.isPrivate === 'true',
     })
 
     await event.related('categories').attach(categories)
@@ -222,6 +223,7 @@ export default class EventsController {
         hasMeal: Boolean(body.has_meal),
         endDate: body.endDate === 'null' ? null : body.endDate,
         repeatDays: body.repeatDays === 'null' ? null : body.repeatDays,
+        isPrivate: body.isPrivate === 'true',
       }
     )
 

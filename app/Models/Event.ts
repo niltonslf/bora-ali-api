@@ -84,4 +84,7 @@ export default class Event extends BaseModel {
 
   @column()
   public repeatDays: string
+
+  @column()
+  public isPrivate: boolean
 }

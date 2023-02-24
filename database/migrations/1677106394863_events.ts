@@ -5,7 +5,7 @@ export default class extends BaseSchema {
 
   public async up() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.boolean('isPrivate')
+      table.boolean('is_private')
     })
   }
 
