@@ -87,4 +87,7 @@ export default class Event extends BaseModel {
 
   @column()
   public isPrivate: boolean
+
+  @manyToMany(() => User)
+  public participants: ManyToMany<typeof User>
 }

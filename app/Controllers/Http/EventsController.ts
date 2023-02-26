@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Category from 'App/Models/Category'
 
@@ -91,37 +92,6 @@ export default class EventsController {
     return [...currentAndFutureEvents, ...repeatEvents]
   }
 
-  private fetchEventsDependencies(events) {
-    return events.map(async (event) => {
-      const images = await Image.query().where('eventId', '=', event.id)
-      const categories = await Category.query()
-        .join('category_event', 'categories.id', 'category_event.category_id')
-        .where('category_event.event_id', '=', event.id)
-
-      const musicStyle = await MusicStyle.query().where('id', '=', event.music_style_id).first()
-      const placeType = await PlaceType.query().where('id', '=', event.place_type_id).first()
-      const user = await User.query().where('id', '=', event.user_id).first()
-
-      Object.assign(event, { images, categories, musicStyle, placeType, user })
-
-      return this.parseData(event)
-    })
-  }
-
-  private parseData(event) {
-    return {
-      ...event,
-      id: event.id,
-      createdAt: event.created_at,
-      updatedAt: event.updated_at,
-      hasMeal: event.has_meal,
-      startDate: event.start_date,
-      endDate: event.end_date,
-      endTime: event.end_time,
-      startTime: event.start_time,
-    }
-  }
-
   public async findAll({ request, response }: HttpContextContract) {
     const params = request.qs()
 
@@ -172,24 +142,11 @@ export default class EventsController {
 
     delete body.imagesUrl
 
-    const event = await Event.create({
-      ...body,
-      hasMeal: Boolean(body.has_meal),
-      endDate: body.endDate === 'null' ? null : body.endDate,
-      repeatDays: body.repeatDays === 'null' ? null : body.repeatDays,
-      isPrivate: body.isPrivate === 'true',
-    })
-
+    const event = await Event.create(this.normalizeBody(body))
     await event.related('categories').attach(categories)
 
     const files = request.files('images', { size: '50mb' })
-
-    if (files) {
-      const imageRes = await ImageUploaderController.UploadImages(files)
-      const imageBody = imageRes.map((image) => ({ image, eventId: event.id }))
-
-      await Image.createMany(imageBody as any)
-    }
+    if (files) this.uploadEventImages(files, event)
 
     if (imagesUrl) {
       const imageRes = await ImageUploaderController.DownloadFromSource(imagesUrl)
@@ -216,18 +173,9 @@ export default class EventsController {
     delete body.imagesUrl
     delete body.id
 
-    const event = await Event.updateOrCreate(
-      { id: eventId },
-      {
-        ...body,
-        hasMeal: Boolean(body.has_meal),
-        endDate: body.endDate === 'null' ? null : body.endDate,
-        repeatDays: body.repeatDays === 'null' ? null : body.repeatDays,
-        isPrivate: body.isPrivate === 'true',
-      }
-    )
+    const event = await Event.updateOrCreate({ id: eventId }, this.normalizeBody(body))
 
-    categories.map(async (category) => {
+    categories.forEach(async (category) => {
       const resCategory = await event
         .related('categories')
         .query()
@@ -238,18 +186,12 @@ export default class EventsController {
       if (!resCategory) await event.related('categories').attach([category])
     })
 
-    if (imagesUrl.length === 0) {
-      await Image.query().where('event_id', event.id).delete()
-    }
+    // delete all images
+    if (imagesUrl.length === 0) await Image.query().where('event_id', event.id).delete()
 
+    // upload new images
     const files = request.files('images', { size: '50mb' })
-
-    if (files) {
-      const imageRes = await ImageUploaderController.UploadImages(files)
-      const imageBody = imageRes.map((image) => ({ image, eventId: event.id }))
-
-      await Image.createMany(imageBody as any)
-    }
+    if (files) this.uploadEventImages(files, event)
 
     response.status(200)
     return event
@@ -262,5 +204,52 @@ export default class EventsController {
 
     response.status(200)
     return res
+  }
+
+  private async uploadEventImages(files: MultipartFileContract[], event: Event) {
+    const imageRes = await ImageUploaderController.UploadImages(files)
+    const imageBody = imageRes.map((image) => ({ image, eventId: event.id }))
+    await Image.createMany(imageBody as any)
+  }
+
+  private normalizeBody(body) {
+    return {
+      ...body,
+      hasMeal: Boolean(body.has_meal),
+      endDate: body.endDate === 'null' ? null : body.endDate,
+      repeatDays: body.repeatDays === 'null' ? null : body.repeatDays,
+      isPrivate: body.isPrivate === 'true',
+    }
+  }
+
+  private fetchEventsDependencies(events) {
+    return events.map(async (event) => {
+      const images = await Image.query().where('eventId', '=', event.id)
+      const categories = await Category.query()
+        .join('category_event', 'categories.id', 'category_event.category_id')
+        .where('category_event.event_id', '=', event.id)
+
+      const musicStyle = await MusicStyle.query().where('id', '=', event.music_style_id).first()
+      const placeType = await PlaceType.query().where('id', '=', event.place_type_id).first()
+      const user = await User.query().where('id', '=', event.user_id).first()
+
+      Object.assign(event, { images, categories, musicStyle, placeType, user })
+
+      return this.parseData(event)
+    })
+  }
+
+  private parseData(event) {
+    return {
+      ...event,
+      id: event.id,
+      createdAt: event.created_at,
+      updatedAt: event.updated_at,
+      hasMeal: event.has_meal,
+      startDate: event.start_date,
+      endDate: event.end_date,
+      endTime: event.end_time,
+      startTime: event.start_time,
+    }
   }
 }
