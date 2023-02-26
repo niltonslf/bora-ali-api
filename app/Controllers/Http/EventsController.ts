@@ -122,6 +122,7 @@ export default class EventsController {
       await event?.load('images')
       await event?.load('musicStyle')
       await event?.load('placeType')
+      await event?.load('participants')
 
       if (event) {
         response.status(200)
