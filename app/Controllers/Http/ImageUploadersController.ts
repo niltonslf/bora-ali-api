@@ -48,12 +48,7 @@ export default class ImageUploaderController {
       const imageName = `${uuid()}.jpg`
       const imagePath = `${Application.tmpPath('uploads')}/${imageName}`
 
-      try {
-        await Downloader.image({ url: fileUrl, dest: imagePath })
-      } catch (error) {
-        console.log({ error })
-      }
-
+      await Downloader.image({ url: fileUrl, dest: imagePath })
       const fileBuffer = fs.readFileSync(imagePath)
 
       await this.initAwsS3().putObject({
