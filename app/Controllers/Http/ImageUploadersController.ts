@@ -1,13 +1,11 @@
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import { v4 as uuid } from 'uuid'
-import Downloader from 'image-downloader'
-import Application from '@ioc:Adonis/Core/Application'
 
 import { S3 } from '@aws-sdk/client-s3'
 
 import fs from 'fs'
 
-import Drive from '@ioc:Adonis/Core/Drive'
+import axios from 'axios'
 
 export default class ImageUploaderController {
   public static initAwsS3() {
@@ -46,27 +44,17 @@ export default class ImageUploaderController {
   public static async DownloadFromSource(filesUrl: string[]): Promise<string[]> {
     const images = filesUrl.map(async (fileUrl) => {
       const imageName = `${uuid()}.jpg`
-      const imagePath = `${Application.tmpPath('uploads')}/${imageName}`
-
-      console.log({ fileUrl })
 
       try {
-        await Downloader.image({ url: fileUrl, dest: imagePath })
-      } catch (error) {
-        console.log({ error })
-      }
+        const response = await axios.get(fileUrl, { responseType: 'arraybuffer' })
+        const buffer = Buffer.from(response.data)
 
-      const fileBuffer = fs.readFileSync(imagePath)
-
-      await this.initAwsS3().putObject({
-        Bucket: process.env.S3_BUCKET,
-        Body: fileBuffer,
-        Key: imageName,
-        ACL: 'public-read',
-      })
-
-      try {
-        await Drive.delete(imagePath)
+        await this.initAwsS3().putObject({
+          Bucket: process.env.S3_BUCKET,
+          Body: buffer,
+          Key: imageName,
+          ACL: 'public-read',
+        })
       } catch (error) {
         console.log({ error })
       }
