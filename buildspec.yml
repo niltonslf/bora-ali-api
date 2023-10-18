@@ -5,15 +5,15 @@ phases:
       nodejs: 18
     commands:
       - echo "⚙️ started install"
-      - yarn install
+      - npm run install
   pre_build:
     commands:
-      - yarn build
+      - npm run build
   build:
     baseDirectory: build
     commands:
       - echo "⚙️ installing build project"
-      - yarn install --production
+      - npm run install --production
   post_build:
     commands:
     - echo "✅ Post build successful"
